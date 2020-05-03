@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 using Session1_TPQR_MobileAPI;
@@ -23,8 +24,100 @@ namespace Session1_TPQR_MobileAPI.Controllers
         [HttpPost]
         public ActionResult Index()
         {
-            var resources = db.Resources;
-            return new JsonResult { Data = resources.ToList() };
+            var customListView = new List<CustomView>();
+            var ResourceList = (from x in db.Resources
+                                select x).ToList();
+
+            foreach (var item in ResourceList)
+            {
+                var newCustomView = new CustomView();
+                if (item.remainingQuantity > 5)
+                {
+                    newCustomView.ResourceName = item.resName;
+                    newCustomView.ResourceType = db.Resource_Type.Where(x => x.resTypeId == item.resTypeIdFK).Select(x => x.resTypeName).FirstOrDefault();
+                    newCustomView.AvailableQuantity = "Sufficient";
+                    newCustomView.NumberOfSkills = db.Resource_Allocation.Where(z => z.resIdFK == item.resId).Select(z => z).Count();
+                    newCustomView.AllocatedSkills = string.Empty;
+                    if (newCustomView.NumberOfSkills == 0)
+                    {
+                        newCustomView.AllocatedSkills = "Nil";
+                    }
+                    else
+                    {
+                        var getAllocatedSkillsList = db.Resource_Allocation.Where(x => x.resIdFK == item.resId).Select(x => x).ToList();
+                        foreach (var allocatedSkill in getAllocatedSkillsList)
+                        {
+                            if (newCustomView.AllocatedSkills == string.Empty)
+                            {
+                                newCustomView.AllocatedSkills = db.Skills.Where(x => x.skillId == allocatedSkill.skillIdFK).Select(x => x.skillName).FirstOrDefault();
+                            }
+                            else
+                            {
+                                newCustomView.AllocatedSkills += $", {db.Skills.Where(x => x.skillId == allocatedSkill.skillIdFK).Select(x => x.skillName).FirstOrDefault()}";
+                            }
+                        }
+                    }
+                    
+                }
+                else if (item.remainingQuantity > 1 && item.remainingQuantity <= 5)
+                {
+                    newCustomView.ResourceName = item.resName;
+                    newCustomView.ResourceType = db.Resource_Type.Where(x => x.resTypeId == item.resTypeIdFK).Select(x => x.resTypeName).FirstOrDefault();
+                    newCustomView.AvailableQuantity = "Low Stock";
+                    newCustomView.NumberOfSkills = db.Resource_Allocation.Where(z => z.resIdFK == item.resId).Select(z => z).Count();
+                    newCustomView.AllocatedSkills = string.Empty;
+                    if (newCustomView.NumberOfSkills == 0)
+                    {
+                        newCustomView.AllocatedSkills = "Nil";
+                    }
+                    else
+                    {
+                        var getAllocatedSkillsList = db.Resource_Allocation.Where(x => x.resIdFK == item.resId).Select(x => x).ToList();
+                        foreach (var allocatedSkill in getAllocatedSkillsList)
+                        {
+                            if (newCustomView.AllocatedSkills == string.Empty)
+                            {
+                                newCustomView.AllocatedSkills = db.Skills.Where(x => x.skillId == allocatedSkill.skillIdFK).Select(x => x.skillName).FirstOrDefault();
+                            }
+                            else
+                            {
+                                newCustomView.AllocatedSkills += $", {db.Skills.Where(x => x.skillId == allocatedSkill.skillIdFK).Select(x => x.skillName).FirstOrDefault()}";
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    newCustomView.ResourceName = item.resName;
+                    newCustomView.ResourceType = db.Resource_Type.Where(x => x.resTypeId == item.resTypeIdFK).Select(x => x.resTypeName).FirstOrDefault();
+                    newCustomView.AvailableQuantity = "Not Available";
+                    newCustomView.NumberOfSkills = db.Resource_Allocation.Where(z => z.resIdFK == item.resId).Select(z => z).Count();
+                    newCustomView.AllocatedSkills = string.Empty;
+                    if (newCustomView.NumberOfSkills == 0)
+                    {
+                        newCustomView.AllocatedSkills = "Nil";
+                    }
+                    else
+                    {
+                        var getAllocatedSkillsList = db.Resource_Allocation.Where(x => x.resIdFK == item.resId).Select(x => x).ToList();
+                        foreach (var allocatedSkill in getAllocatedSkillsList)
+                        {
+                            if (newCustomView.AllocatedSkills == string.Empty)
+                            {
+                                newCustomView.AllocatedSkills = db.Skills.Where(x => x.skillId == allocatedSkill.skillIdFK).Select(x => x.skillName).FirstOrDefault();
+                            }
+                            else
+                            {
+                                newCustomView.AllocatedSkills += $", {db.Skills.Where(x => x.skillId == allocatedSkill.skillIdFK).Select(x => x.skillName).FirstOrDefault()}";
+                            }
+                        }
+                    }
+                }
+
+                customListView.Add(newCustomView);
+            }
+            return new JsonResult { Data = customListView };
+
         }
 
         // POST: Resources/Details/5
@@ -93,4 +186,13 @@ namespace Session1_TPQR_MobileAPI.Controllers
             base.Dispose(disposing);
         }
     }
+    public class CustomView
+    {
+        public string ResourceName { get; set; }
+        public string ResourceType { get; set; }
+        public int NumberOfSkills { get; set; }
+        public string AllocatedSkills { get; set; }
+        public string AvailableQuantity { get; set; }
+    }
+
 }

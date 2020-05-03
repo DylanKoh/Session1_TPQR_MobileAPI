@@ -44,9 +44,18 @@ namespace Session1_TPQR_MobileAPI.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Users.Add(user);
-                db.SaveChanges();
-                return Json("User has been created!");
+                var checkUser = db.Users.Where(x => x.userId == user.userId).Select(x => x).FirstOrDefault();
+                if (checkUser == null)
+                {
+                    db.Users.Add(user);
+                    db.SaveChanges();
+                    return Json("User has been created!");
+                }
+                else
+                {
+                    return Json("User ID has been taken!");
+                }
+                
             }
 
             return Json("Error, User cannot be created. Please check your fields and try again!");
@@ -59,6 +68,7 @@ namespace Session1_TPQR_MobileAPI.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 db.Entry(user).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");

@@ -14,14 +14,21 @@ namespace Session1_TPQR_MobileAPI.Controllers
     {
         private Session1Entities db = new Session1Entities();
 
-        // GET: Resources
-        public ActionResult Index()
+        public ResourcesController()
         {
-            var resources = db.Resources.Include(r => r.Resource_Type);
-            return View(resources.ToList());
+            db.Configuration.LazyLoadingEnabled = false;
         }
 
-        // GET: Resources/Details/5
+        // POST: Resources
+        [HttpPost]
+        public ActionResult Index()
+        {
+            var resources = db.Resources;
+            return new JsonResult { Data = resources.ToList() };
+        }
+
+        // POST: Resources/Details/5
+        [HttpPost]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -36,18 +43,9 @@ namespace Session1_TPQR_MobileAPI.Controllers
             return View(resource);
         }
 
-        // GET: Resources/Create
-        public ActionResult Create()
-        {
-            ViewBag.resTypeIdFK = new SelectList(db.Resource_Type, "resTypeId", "resTypeName");
-            return View();
-        }
 
         // POST: Resources/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "resId,resName,resTypeIdFK,remainingQuantity")] Resource resource)
         {
             if (ModelState.IsValid)
@@ -61,27 +59,9 @@ namespace Session1_TPQR_MobileAPI.Controllers
             return View(resource);
         }
 
-        // GET: Resources/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Resource resource = db.Resources.Find(id);
-            if (resource == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.resTypeIdFK = new SelectList(db.Resource_Type, "resTypeId", "resTypeName", resource.resTypeIdFK);
-            return View(resource);
-        }
 
         // POST: Resources/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "resId,resName,resTypeIdFK,remainingQuantity")] Resource resource)
         {
             if (ModelState.IsValid)
@@ -94,24 +74,8 @@ namespace Session1_TPQR_MobileAPI.Controllers
             return View(resource);
         }
 
-        // GET: Resources/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Resource resource = db.Resources.Find(id);
-            if (resource == null)
-            {
-                return HttpNotFound();
-            }
-            return View(resource);
-        }
-
         // POST: Resources/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
             Resource resource = db.Resources.Find(id);

@@ -14,14 +14,21 @@ namespace Session1_TPQR_MobileAPI.Controllers
     {
         private Session1Entities db = new Session1Entities();
 
-        // GET: Resource_Allocation
+        public Resource_AllocationController()
+        {
+            db.Configuration.LazyLoadingEnabled = false;
+        }
+
+        // POST: Resource_Allocation
+        [HttpPost]
         public ActionResult Index()
         {
             var resource_Allocation = db.Resource_Allocation.Include(r => r.Resource).Include(r => r.Skill);
             return View(resource_Allocation.ToList());
         }
 
-        // GET: Resource_Allocation/Details/5
+        // POST: Resource_Allocation/Details/5
+        [HttpPost]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -36,19 +43,9 @@ namespace Session1_TPQR_MobileAPI.Controllers
             return View(resource_Allocation);
         }
 
-        // GET: Resource_Allocation/Create
-        public ActionResult Create()
-        {
-            ViewBag.resIdFK = new SelectList(db.Resources, "resId", "resName");
-            ViewBag.skillIdFK = new SelectList(db.Skills, "skillId", "skillName");
-            return View();
-        }
 
         // POST: Resource_Allocation/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "allocId,resIdFK,skillIdFK")] Resource_Allocation resource_Allocation)
         {
             if (ModelState.IsValid)
@@ -63,28 +60,10 @@ namespace Session1_TPQR_MobileAPI.Controllers
             return View(resource_Allocation);
         }
 
-        // GET: Resource_Allocation/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Resource_Allocation resource_Allocation = db.Resource_Allocation.Find(id);
-            if (resource_Allocation == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.resIdFK = new SelectList(db.Resources, "resId", "resName", resource_Allocation.resIdFK);
-            ViewBag.skillIdFK = new SelectList(db.Skills, "skillId", "skillName", resource_Allocation.skillIdFK);
-            return View(resource_Allocation);
-        }
+        
 
         // POST: Resource_Allocation/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "allocId,resIdFK,skillIdFK")] Resource_Allocation resource_Allocation)
         {
             if (ModelState.IsValid)
@@ -98,24 +77,10 @@ namespace Session1_TPQR_MobileAPI.Controllers
             return View(resource_Allocation);
         }
 
-        // GET: Resource_Allocation/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Resource_Allocation resource_Allocation = db.Resource_Allocation.Find(id);
-            if (resource_Allocation == null)
-            {
-                return HttpNotFound();
-            }
-            return View(resource_Allocation);
-        }
+       
 
         // POST: Resource_Allocation/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
             Resource_Allocation resource_Allocation = db.Resource_Allocation.Find(id);

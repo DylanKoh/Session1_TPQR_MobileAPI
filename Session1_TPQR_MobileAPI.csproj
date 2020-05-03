@@ -132,6 +132,7 @@
     <Compile Include="Controllers\ResourcesController.cs" />
     <Compile Include="Controllers\Resource_AllocationController.cs" />
     <Compile Include="Controllers\Resource_TypeController.cs" />
+    <Compile Include="Controllers\SkillsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Controllers\User_TypeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -232,6 +233,7 @@
     <Folder Include="Views\Resources\" />
     <Folder Include="Views\Resource_Allocation\" />
     <Folder Include="Views\Resource_Type\" />
+    <Folder Include="Views\Skills\" />
     <Folder Include="Views\Users\" />
     <Folder Include="Views\User_Type\" />
   </ItemGroup>

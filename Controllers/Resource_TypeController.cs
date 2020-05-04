@@ -19,13 +19,15 @@ namespace Session1_TPQR_MobileAPI.Controllers
             db.Configuration.LazyLoadingEnabled = false;
         }
 
-        // GET: Resource_Type
+        // POST: Resource_Type
+        [HttpPost]
         public ActionResult Index()
         {
-            return View(db.Resource_Type.ToList());
+            return new JsonResult { Data = db.Resource_Type.ToList() };
         }
 
-        // GET: Resource_Type/Details/5
+        // POST: Resource_Type/Details/5
+        [HttpPost]
         public ActionResult Details(int? id)
         {
             if (id == null)

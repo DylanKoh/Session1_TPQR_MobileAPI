@@ -26,7 +26,7 @@ namespace Session1_TPQR_MobileAPI.Controllers
         {
             var customListView = new List<CustomView>();
             var ResourceList = (from x in db.Resources
-                                select x).ToList();
+                                select x);
 
             foreach (var item in ResourceList)
             {

@@ -19,13 +19,15 @@ namespace Session1_TPQR_MobileAPI.Controllers
             db.Configuration.LazyLoadingEnabled = false;
         }
 
-        // GET: Skills
+        // POST: Skills
+        [HttpPost]
         public ActionResult Index()
         {
-            return View(db.Skills.ToList());
+            return new JsonResult { Data = db.Skills.ToList() };
         }
 
-        // GET: Skills/Details/5
+        // POST: Skills/Details/5
+        [HttpPost]
         public ActionResult Details(int? id)
         {
             if (id == null)

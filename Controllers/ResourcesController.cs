@@ -169,12 +169,24 @@ namespace Session1_TPQR_MobileAPI.Controllers
 
         // POST: Resources/Delete/5
         [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(string ResourceName)
         {
-            Resource resource = db.Resources.Find(id);
+            Resource resource = db.Resources.Where(x => x.resName == ResourceName).Select(x => x).FirstOrDefault();
+            var allocation = db.Resource_Allocation.Where(x => x.resIdFK == resource.resId).Select(x => x);
             db.Resources.Remove(resource);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            foreach (var item in allocation)
+            {
+                db.Resource_Allocation.Remove(item);
+                db.SaveChanges();
+            }
+            return Json("Resource has been successfully deleted!");
+        }
+
+        public ActionResult GetNewID()
+        {
+            var newID = db.Resources.OrderByDescending(x => x.resId).Select(x => x.resId).FirstOrDefault() + 1;
+            return Json(newID);
         }
 
         protected override void Dispose(bool disposing)

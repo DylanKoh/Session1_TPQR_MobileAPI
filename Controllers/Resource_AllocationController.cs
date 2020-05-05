@@ -78,17 +78,6 @@ namespace Session1_TPQR_MobileAPI.Controllers
         }
 
        
-
-        // POST: Resource_Allocation/Delete/5
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Resource_Allocation resource_Allocation = db.Resource_Allocation.Find(id);
-            db.Resource_Allocation.Remove(resource_Allocation);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)

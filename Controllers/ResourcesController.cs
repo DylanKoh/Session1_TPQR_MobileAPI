@@ -57,7 +57,7 @@ namespace Session1_TPQR_MobileAPI.Controllers
                             }
                         }
                     }
-                    
+
                 }
                 else if (item.remainingQuantity > 1 && item.remainingQuantity <= 5)
                 {
@@ -122,18 +122,11 @@ namespace Session1_TPQR_MobileAPI.Controllers
 
         // POST: Resources/Details/5
         [HttpPost]
-        public ActionResult Details(int? id)
+        public ActionResult Details(string ResourceName)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Resource resource = db.Resources.Find(id);
-            if (resource == null)
-            {
-                return HttpNotFound();
-            }
-            return View(resource);
+           
+            Resource resource = db.Resources.Where(x => x.resName == ResourceName).Select(x => x).FirstOrDefault();
+            return Json(resource);
         }
 
 
@@ -141,15 +134,24 @@ namespace Session1_TPQR_MobileAPI.Controllers
         [HttpPost]
         public ActionResult Create([Bind(Include = "resId,resName,resTypeIdFK,remainingQuantity")] Resource resource)
         {
-            if (ModelState.IsValid)
+            var checkResource = db.Resources.Where(x => x.resName == resource.resName).Select(x => x).FirstOrDefault();
+            if (checkResource == null)
             {
-                db.Resources.Add(resource);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Resources.Add(resource);
+                    db.SaveChanges();
+                    return Json("Resource Created successfully!");
+                }
+                return Json("Unable to create resource!");
+            }
+            else
+            {
+                return Json("Resource Name already exist!");
             }
 
-            ViewBag.resTypeIdFK = new SelectList(db.Resource_Type, "resTypeId", "resTypeName", resource.resTypeIdFK);
-            return View(resource);
+
+
         }
 
 
@@ -161,10 +163,9 @@ namespace Session1_TPQR_MobileAPI.Controllers
             {
                 db.Entry(resource).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return Json("Edit resource successful!");
             }
-            ViewBag.resTypeIdFK = new SelectList(db.Resource_Type, "resTypeId", "resTypeName", resource.resTypeIdFK);
-            return View(resource);
+            return Json("Unable to edit resource!");
         }
 
         // POST: Resources/Delete/5
@@ -173,19 +174,19 @@ namespace Session1_TPQR_MobileAPI.Controllers
         {
             Resource resource = db.Resources.Where(x => x.resName == ResourceName).Select(x => x).FirstOrDefault();
             var allocation = db.Resource_Allocation.Where(x => x.resIdFK == resource.resId).Select(x => x);
-            db.Resources.Remove(resource);
-            db.SaveChanges();
             foreach (var item in allocation)
             {
                 db.Resource_Allocation.Remove(item);
-                db.SaveChanges();
             }
+            db.Resources.Remove(resource);
+            db.SaveChanges();
+            
             return Json("Resource has been successfully deleted!");
         }
 
-        public ActionResult GetNewID()
+        public ActionResult GetLastestID()
         {
-            var newID = db.Resources.OrderByDescending(x => x.resId).Select(x => x.resId).FirstOrDefault() + 1;
+            var newID = db.Resources.OrderByDescending(x => x.resId).Select(x => x.resId).FirstOrDefault();
             return Json(newID);
         }
 

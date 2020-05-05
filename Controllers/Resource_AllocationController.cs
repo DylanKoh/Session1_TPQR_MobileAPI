@@ -23,24 +23,17 @@ namespace Session1_TPQR_MobileAPI.Controllers
         [HttpPost]
         public ActionResult Index()
         {
-            var resource_Allocation = db.Resource_Allocation.Include(r => r.Resource).Include(r => r.Skill);
-            return View(resource_Allocation.ToList());
+            var resource_Allocation = db.Resource_Allocation;
+            return Json(resource_Allocation.ToList());
         }
 
-        // POST: Resource_Allocation/Details/5
+        // POST: Resource_Allocation/GetDetails?resID{}
         [HttpPost]
-        public ActionResult Details(int? id)
+        public ActionResult GetDetails(string resID)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Resource_Allocation resource_Allocation = db.Resource_Allocation.Find(id);
-            if (resource_Allocation == null)
-            {
-                return HttpNotFound();
-            }
-            return View(resource_Allocation);
+            var _resID = Int32.Parse(resID);
+            var resource_Allocation = db.Resource_Allocation.Where(x => x.resIdFK == _resID).Select(x => x);
+            return new JsonResult { Data = resource_Allocation.ToList() };
         }
 
 
@@ -52,32 +45,28 @@ namespace Session1_TPQR_MobileAPI.Controllers
             {
                 db.Resource_Allocation.Add(resource_Allocation);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return Json("Allocation created successfully!");
             }
 
-            ViewBag.resIdFK = new SelectList(db.Resources, "resId", "resName", resource_Allocation.resIdFK);
-            ViewBag.skillIdFK = new SelectList(db.Skills, "skillId", "skillName", resource_Allocation.skillIdFK);
-            return View(resource_Allocation);
+            return Json("Unable to create allocation!");
         }
 
-        
-
-        // POST: Resource_Allocation/Edit/5
-        [HttpPost]
-        public ActionResult Edit([Bind(Include = "allocId,resIdFK,skillIdFK")] Resource_Allocation resource_Allocation)
+        // POST: Resource_Allocation/Delete?ResID={}
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(string ResID)
         {
-            if (ModelState.IsValid)
+            var _resID = Int32.Parse(ResID);
+            var toDelete = db.Resource_Allocation.Where(x => x.resIdFK == _resID).Select(x => x);
+            foreach (var item in toDelete)
             {
-                db.Entry(resource_Allocation).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                db.Resource_Allocation.Remove(item);
             }
-            ViewBag.resIdFK = new SelectList(db.Resources, "resId", "resName", resource_Allocation.resIdFK);
-            ViewBag.skillIdFK = new SelectList(db.Skills, "skillId", "skillName", resource_Allocation.skillIdFK);
-            return View(resource_Allocation);
+            db.SaveChanges();
+            return Json("Delete successful!");
         }
 
-       
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
